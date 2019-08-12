@@ -1,13 +1,24 @@
 class Player {
-  constructor(name, id, hand, container, pointBoard, handBoard, winLose) {
+  constructor(name, id, hand, mainContainer, nameContainer,  pointContainer, handContainer) {
     this.name = name
     this.id = id
     this.hand = hand
     this.points = 0
-    this.container = container
-    this.pointBoard = pointBoard
-    this.handBoard = handBoard
-    this.winLose = winLose
+    this.nameContainer = nameContainer
+    this.mainContainer = mainContainer
+    this.pointContainer = pointContainer
+    this.handContainer = handContainer
+    this.wins = 0
+  }
+
+  hit = () => {
+    let topCard = deck.pop()
+    this.hand.push(topCard)
+  }
+
+  stand = () => {
+    this.mainContainer.classList.remove('active')
+    this.mainContainer.classList.add('hidden')
   }
 }
 
@@ -46,14 +57,13 @@ const suitColors = {
 
 const deck = []
 const players = []
+let currentPlayer = 0
+let currPlayer = players[currentPlayer]
 
 const playerContainer = document.querySelector('#players')
 const standBtn = document.querySelector('#stand-btn')
 const hitBtn = document.querySelector('#hit-btn')
 const startBtn = document.querySelector('#start-btn')
-
-let currentPlayer = 0
-let currPlayer = document.querySelector(`#player-1`)
 
 const createDeck = () => {
   ranks.forEach(rank => {
@@ -61,19 +71,10 @@ const createDeck = () => {
       deck.push(new Card(rank, suit))
     })
   })
-} 
-
-const dealHand = () => {
-  for(let i = 0; i < 2; i++) {
-    players.forEach(player => {
-      let topCard = deck.pop()
-      player.hand.push(topCard)
-    })
-  }
 }
 
 const shuffleCards = () => {
-  deck.forEach(() => {
+  deck.map(() => {  
     let randCardIndex = Math.floor(Math.random() * deck.length)
     let randCardIndex2 = Math.floor(Math.random() * deck.length)
     let temp = deck[randCardIndex]
@@ -83,166 +84,132 @@ const shuffleCards = () => {
   })
 }
 
-const hitMe = () => {
-  const cardContainer = document.createElement('div')
-  const cardSuitTop = document.createElement('span')
-  const cardRank = document.createElement('span')
-  const cardSuitBot = document.createElement('span')
-
-  let topCard = deck.pop()
-  players[currentPlayer].hand.push(topCard)
-  const lastCardInHand = players[currentPlayer].hand.length - 1 
-
-  const newItem = document.createElement('li')
-
-  cardContainer.classList = 'card'
-
-  cardSuitTop.id = 'card-suit-top'
-  cardSuitTop.classList.add('prop')
-  cardSuitTop.textContent = `${players[currentPlayer].hand[lastCardInHand].suit}`
-
-  cardRank.id = 'card-rank'
-  cardRank.classList.add('prop')
-  cardRank.textContent = `${players[currentPlayer].hand[lastCardInHand].rank}`
-
-  cardSuitBot.id = 'card-suit-bot'
-  cardSuitBot.classList.add('prop')
-  cardSuitBot.textContent = `${players[currentPlayer].hand[lastCardInHand].suit}`
-
-  cardContainer.appendChild(cardSuitTop)
-  cardContainer.appendChild(cardRank)
-  cardContainer.appendChild(cardSuitBot)
-      
-  players[currentPlayer].handBoard.appendChild(cardContainer)
-
-  players[currentPlayer].container.appendChild(players[currentPlayer].handBoard)
-  playerContainer.appendChild(players[currentPlayer].container)
-
-  updatePoints()
-  check()
-}
-
-const stand = () => {
-  if (currentPlayer != players.length-1) {
-    document.getElementById('player-1').classList.remove('active')
-    currentPlayer += 1;
-    document.getElementById('player-2').classList.add('active')
-  }
-  else {
-    endGame();
+const dealHand = () => {
+  let counter = 0
+  while(counter < 2) {
+    counter++
+    players.map(player => {
+      let topCard = deck.pop()
+      player.hand.push(topCard)
+    })
   }
 }
 
-const endGame = () => {
-  if (players[0].points > players[1].points) {
-    window.alert('Player 1 Wins!')
-    reset()
-  }
-  else if (players[0].points < players[1].points) {
-    window.alert('Player 2 Wins!')
-    reset()
-  }
-  else {
-    window.alert('It is a tie!')
-    reset()
+const createPlayers = (num) => {
+  for(let i = 1; i <= num; i++) {
+    let hand = []
+    let mainContainer = document.createElement('div')
+    const pointContainer = document.createElement('h3')
+    const handContainer = document.createElement('ul')
+    const nameContainer = document.createElement('h2')
+    let player = new Player(`player ${i}`, i, hand, mainContainer, nameContainer, nameContainer, pointContainer, handContainer)
+    players.push(player)
   }
 }
 
 const updatePoints = () => {
   players.forEach(player => {
     player.points = 0
+    player.hand.forEach(card => {
+      player.points += card.value
+    })
+  })
+}
 
-    for(let i = 0; i < player.hand.length; i++) {
-      player.points += player.hand[i].value
-    }
+const hitMe = () => {
+  players[currentPlayer].hit()
+  updatePoints()
+  check(players[currentPlayer])
+  createUi()    
+}
+
+const standRound = () => {
+  if (currentPlayer !== players.length-1) {
+    players[currentPlayer].stand()
+    currentPlayer++
+    createUi()
+  }
+  else {
+    endGame()
+  }
+}
+
+const check = (player) => {
+  if(player.points > 21) {
+    window.alert(`${player.name} busted!`)
+    resetGame()
+  }
+}
+
+const endGame = () => {
+  if (players[0].points > players[1].points > 21) {
+    window.alert('Player 1 Wins!')
+    player[0].wins++
+  }
+  else if (players[0].points == players[1].points) {
+    window.alert("It's a tie!")
+  }
+  else {
+    window.alert('Player 2 Wins!')
+    player[1].wins++
+  }
+  resetGame()
+}
+
+const resetGame = () => {
+}
+
+const createUi = () => {
+  const currPlayerContainer = players[currentPlayer].mainContainer
+
+  const currPlayerName = players[currentPlayer].nameContainer
+  currPlayerName.textContent = `${players[currentPlayer].name}`
+
+  const currPlayerPoints = players[currentPlayer].pointContainer
+  currPlayerPoints.textContent = `${players[currentPlayer].points}`
+
+  const currPlayerHand = players[currentPlayer].handContainer
+  currPlayerHand.textContent = ''
+  currPlayerContainer.textContent = ''
+  for(let i = 0; i < players[currentPlayer].hand.length; i++) {
+    const cardContainer = document.createElement('div')
+    const cardSuitTop = document.createElement('span')
+    const cardRank = document.createElement('span')
+    const cardSuitBot = document.createElement('span')
+
+    cardContainer.classList.add('card')
+    cardSuitTop.id = 'card-suit-top'
+    cardSuitTop.classList.add('prop')
+    cardSuitTop.textContent = `${players[currentPlayer].hand[i].suit}`
+
+    cardRank.id = 'card-rank'
+    cardRank.classList.add('prop')
+    cardRank.textContent = `${players[currentPlayer].hand[i].rank}`
+
+    cardSuitBot.id = 'card-suit-bot'
+    cardSuitBot.classList.add('prop')
+    cardSuitBot.textContent = `${players[currentPlayer].hand[i].suit}`
+
+    cardContainer.appendChild(cardSuitTop)
+    cardContainer.appendChild(cardRank)
+    cardContainer.appendChild(cardSuitBot)
+
+    currPlayerHand.appendChild(cardContainer)
+  }
   
-    player.pointBoard.id = 'score-board'
-    player.pointBoard.textContent = `Player ${player.id} Points: ${player.points}`
 
-    player.container.appendChild(player.pointBoard)
-    playerContainer.appendChild(player.container)
-  })
-}
-
-const createUI = () => {
-  playerContainer.textContent = ''
-  players.forEach(player => {
-    const playerName = document.createElement('h2')
-
-    for(let i = 0; i < player.hand.length; i++) {
-      const handList = document.createElement('li')
-      const cardContainer = document.createElement('div')
-      const cardSuitTop = document.createElement('span')
-      const cardRank = document.createElement('span')
-      const cardSuitBot = document.createElement('span')
-
-      cardContainer.classList = 'card'
-
-      cardSuitTop.id = 'card-suit-top'
-      cardSuitTop.classList.add('prop')
-      cardSuitTop.textContent = `${player.hand[i].suit}`
-
-      cardRank.id = 'card-rank'
-      cardRank.classList.add('prop')
-      cardRank.textContent = `${player.hand[i].rank}`
-
-      cardSuitBot.id = 'card-suit-bot'
-      cardSuitBot.classList.add('prop')
-      cardSuitBot.textContent = `${player.hand[i].suit}`
-
-      cardContainer.appendChild(cardSuitTop)
-      cardContainer.appendChild(cardRank)
-      cardContainer.appendChild(cardSuitBot)
-      
-      player.handBoard.appendChild(cardContainer)
-    }
-
-    updatePoints()
-    
-    player.container.id =  `player-${player.id}`
-    player.container.className = 'player'
-
-    playerName.textContent = `${player.name}`
-
-    player.container.id = `player-${player.id}`
-
-    player.container.appendChild(playerName)
-    player.container.appendChild(player.handBoard)
-
-    playerContainer.appendChild(player.container)
-  })
-}
-
-const reset = () => {
-  location.reload()
-}
-
-const check = () => {
-  if (players[currentPlayer].points > 21) {
-    window.alert(`Player ${currentPlayer+ 1} loses!`)
-    reset()
-  }
-}
-
-const createPlayers = () => {
-  for(let i = 1; i <= 2; i++) {
-    let hand = []
-    let container = document.createElement('div')
-    const pointBoard = document.createElement('h3')
-    const handBoard = document.createElement('ul')
-    const cards = document.createElement('li')
-    const banner = document.createElement('h1')
-    let player = new Player(`player ${i}`, i, hand, container, pointBoard, handBoard, cards, banner)
-    players.push(player)
-  }
+  currPlayerContainer.appendChild(currPlayerName)
+  currPlayerContainer.appendChild(currPlayerPoints)
+  currPlayerContainer.appendChild(currPlayerHand)
+  playerContainer.appendChild(currPlayerContainer)
 }
 
 const startGame = () => {
   createDeck()
   shuffleCards()
-  createPlayers()
+  createPlayers(2)
   dealHand()
   updatePoints()
-  createUI()
-  document.getElementById('player-1').classList.add('active')
+  createUi()
+  // console.log(players)
 }
