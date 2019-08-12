@@ -9,4 +9,77 @@ html {
 body {
   margin: 0;
   min-height: 100%;
+  background-color: darkslategrey;
+}
+
+#players {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#controller {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#title {
+  display: flex;
+  justify-content: center;
+}
+
+.active {
+  border: 0.5rem solid;
+}
+
+.card {
+  position: relative;
+  background-color: whitesmoke;
+  width: 5rem;
+  height: 7.5rem;
+  left: 2rem;
+  top: 2rem;
+  border-radius: 5px;
+  font-size: 20px;
+}
+
+.card-suit {
+  width: 100%;
+  display: block;
+}
+
+#card-suit-top {
+  text-align: left;
+  padding-left: 5px;
+}
+
+#card-suit-bot {
+  position: absolute;
+  bottom: 0px;
+  text-align: left;
+  right: 5px;
+  transform: rotate(180deg);
+}
+
+#card-rank {
+  width: 100%;
+  position: absolute;
+  top: 38%;
+  justify-content: center;
+  left: 0rem;
+  text-align: center;
+}
+
+#score-board {
+  position: relative;
+  top: 1rem;
+}
+
+.red {
+  color: #FF0000;
+}
+
+.black {
+  color: #000;
 }

@@ -8,7 +8,20 @@
     <link rel="stylesheet" href="/screen.css">
   </head>
   <body>
-    <h1 class='hello-world'></h1>
+      <h1 id="title">Jack Black</h1>
+    <div id="controller">
+        <input id="start-btn"type="button" value="Start" onclick="startGame()" />
+        <input id="hit-btn" type="button" value="Hit me" onclick="hitMe()"/>
+        <input id="stand-btn" type="button" value="Stand" onclick="stand()" />
+        <input id="reset-btn" type="button" value="Reset" onclick="reset()" />
+    </div>
+
+    <div id="deck">
+      <span id="status"></span>
+    </div>
+
+    <div id="players">
+    </div>
     <script src="/main.js" charset="utf-8"></script>
   </body>
 </html>
