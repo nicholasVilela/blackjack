@@ -1,5 +1,5 @@
 class Player {
-  constructor(name, id, hand, mainContainer, nameContainer,  pointContainer, handContainer) {
+  constructor(name, id, hand, mainContainer, nameContainer,  pointContainer, handContainer, winsBox) {
     this.name = name
     this.id = id
     this.hand = hand
@@ -8,6 +8,7 @@ class Player {
     this.mainContainer = mainContainer
     this.pointContainer = pointContainer
     this.handContainer = handContainer
+    this.winsBox = winsBox
     this.wins = 0
   }
 
@@ -17,7 +18,6 @@ class Player {
   }
 
   stand = () => {
-    this.mainContainer.classList.remove('active')
     this.mainContainer.classList.add('hidden')
   }
 }
@@ -58,12 +58,13 @@ const suitColors = {
 const deck = []
 const players = []
 let currentPlayer = 0
-let currPlayer = players[currentPlayer]
-
 const playerContainer = document.querySelector('#players')
 const standBtn = document.querySelector('#stand-btn')
 const hitBtn = document.querySelector('#hit-btn')
 const startBtn = document.querySelector('#start-btn')
+
+
+
 
 const createDeck = () => {
   ranks.forEach(rank => {
@@ -102,7 +103,8 @@ const createPlayers = (num) => {
     const pointContainer = document.createElement('h3')
     const handContainer = document.createElement('ul')
     const nameContainer = document.createElement('h2')
-    let player = new Player(`player ${i}`, i, hand, mainContainer, nameContainer, nameContainer, pointContainer, handContainer)
+    const winsBox = document.createElement('h3')
+    let player = new Player(`player ${i}`, i, hand, mainContainer, nameContainer, pointContainer, handContainer, winsBox)
     players.push(player)
   }
 }
@@ -157,18 +159,36 @@ const endGame = () => {
 }
 
 const resetGame = () => {
+  const currPlayerContainer = players[currentPlayer].mainContainer
+  const currPlayerName = players[currentPlayer].nameContainer
+  // const currPlayerWins = players[currentPlayer].winsBox
+  const currPlayerPoints = players[currentPlayer].pointContainer
+  const currPlayerHand = players[currentPlayer].handContainer
+
+  currPlayerName.textContent = ''
+  currPlayerPoints.textContent = ''
+  currPlayerHand.textContent = ''
+  currPlayerContainer.appendChild(currPlayerName)
+  currPlayerContainer.appendChild(currPlayerPoints)
+  currPlayerContainer.appendChild(currPlayerHand)
+  playerContainer.appendChild(currPlayerContainer)
 }
 
-const createUi = () => {
+
+
+const createUi = () => {  
   const currPlayerContainer = players[currentPlayer].mainContainer
 
   const currPlayerName = players[currentPlayer].nameContainer
-  currPlayerName.textContent = `${players[currentPlayer].name}`
-
+  const currPlayerWins = players[currentPlayer].winsBox
   const currPlayerPoints = players[currentPlayer].pointContainer
-  currPlayerPoints.textContent = `${players[currentPlayer].points}`
-
   const currPlayerHand = players[currentPlayer].handContainer
+  currPlayerName.textContent = `${players[currentPlayer].name}`
+  
+  currPlayerWins.textContent = `${players[currentPlayer].wins}`
+  
+  currPlayerPoints.textContent = `${players[currentPlayer].points}`
+  
   currPlayerHand.textContent = ''
   currPlayerContainer.textContent = ''
   for(let i = 0; i < players[currentPlayer].hand.length; i++) {
@@ -196,9 +216,9 @@ const createUi = () => {
 
     currPlayerHand.appendChild(cardContainer)
   }
-  
 
   currPlayerContainer.appendChild(currPlayerName)
+  currPlayerContainer.appendChild(currPlayerWins)
   currPlayerContainer.appendChild(currPlayerPoints)
   currPlayerContainer.appendChild(currPlayerHand)
   playerContainer.appendChild(currPlayerContainer)
@@ -211,5 +231,4 @@ const startGame = () => {
   dealHand()
   updatePoints()
   createUi()
-  // console.log(players)
 }
